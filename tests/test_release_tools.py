@@ -4,6 +4,7 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -20,6 +21,20 @@ release = load("package_release")
 
 
 class ReleaseTests(unittest.TestCase):
+    def test_source_archive_excludes_generated_local_configuration(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "source"
+            source.mkdir()
+            for name in ("sdkconfig", "sdkconfig.old", "app_config.h", "dependencies.lock",
+                         "sdkconfig.release", "app_main.c"):
+                (source / name).write_text("test fixture")
+            (source / "build").mkdir()
+            (source / "build" / "private.bin").write_bytes(b"private test fixture")
+            output = Path(directory) / "source.zip"
+            release.archive_source(source, output)
+            with zipfile.ZipFile(output) as zipped:
+                self.assertEqual(set(zipped.namelist()), {"sdkconfig.release", "app_main.c"})
+
     def validate(self, **changes):
         values = dict(ssid="bench", password="test,password", host="192.168.1.100",
                       port="5111", aircraft="FlyByWire", gpio=38, brightness=16)

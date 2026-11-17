@@ -43,6 +43,15 @@ def archive(source, output):
                 zipped.write(path, path.relative_to(source))
 
 
+def archive_source(source, output):
+    with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as zipped:
+        for path in sorted(source.rglob("*")):
+            relative = path.relative_to(source)
+            if (path.is_file() and path.name not in EXCLUDED_FILES
+                    and not any(p in EXCLUDED_DIRS for p in relative.parts)):
+                zipped.write(path, relative)
+
+
 def package(output):
     # Refuse overwrite; never publish or use an existing, locally configured build.
     if output.exists():
@@ -100,22 +109,17 @@ def package(output):
         if sdk_untracked:
             raise RuntimeError("SDK has untracked files; review them before distributing firmware")
         archive(public, assets / "esp32s3-firmware.zip")
-        # A clean source snapshot, including build scripts and license notices.
-        # Exclude build output from source; retain it separately for relinking.
-        source_zip = assets / "source.zip"
-        with zipfile.ZipFile(source_zip, "w", zipfile.ZIP_DEFLATED) as zipped:
-            for path in sorted(source.rglob("*")):
-                relative = path.relative_to(source)
-                if path.is_file() and not any(p in EXCLUDED_DIRS for p in relative.parts):
-                    zipped.write(path, relative)
-        archive(build, assets / "relink-build.zip")
+        # Full library and application source plus configuration/build scripts
+        # allow modification and relinking without exposing machine-local debug
+        # paths from ELF/object files, Ninja commands or CMake caches.
+        archive_source(source, assets / "source.zip")
         sums = []
         for path in sorted(assets.glob("*.zip")):
             sums.append(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n")
         (assets / "SHA256SUMS").write_text("".join(sums))
         shutil.move(str(assets), output)
     print(f"Release assets ready: {output}")
-    print("Publish all three ZIPs and SHA256SUMS together; no upload was performed.")
+    print("Publish both ZIPs and SHA256SUMS together; no upload was performed.")
 
 
 def main():

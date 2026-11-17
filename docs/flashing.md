@@ -14,7 +14,7 @@ Use a trusted LAN, not real aircraft or safety-critical equipment.
 ## Downloads and tools
 
 Download and extract `esp32s3-firmware.zip` from the same GitHub Release as
-`source.zip`, `relink-build.zip`, and `SHA256SUMS`. Verify downloaded ZIP hashes
+`source.zip` and `SHA256SUMS`. Verify downloaded ZIP hashes
 against `SHA256SUMS` (for example `shasum -a 256 *.zip`).
 The shared firmware contains **no configured Wi-Fi credentials**.
 If no release is published yet, a maintainer must generate and attach these assets.
@@ -107,10 +107,9 @@ Upload **all** assets from `dist/esp32s3-VERSION/` to the matching GitHub Releas
 
 - `esp32s3-firmware.zip`: only the three flash binaries, instructions, settings
   generator, SDK build evidence, and license notices.
-- `source.zip`: corresponding project sources, build/configuration instructions,
-  and generated `sdkconfig.release`.
-- `relink-build.zip`: clean build artifacts, including ELF, object files,
-  static libraries, linker scripts and Ninja commands for relinking/debugging.
+- `source.zip`: corresponding library and application sources, build/configuration
+  instructions, SDK patch, and generated `sdkconfig.release`, allowing recipients
+  to modify, rebuild and relink the application.
 - `SHA256SUMS`: ZIP checksums.
 
 Keep `dist/` and all `build/` directories out of Git. Keep tests and development
@@ -118,8 +117,10 @@ tools in Git; users do not need them to flash a release.
 
 ### Source and relinking
 
-Firmware is LGPL-3.0-or-later; distribute the corresponding source and relinking
-materials alongside binaries, with the notices. The ESP-IDF components carry
+Firmware is LGPL-3.0-or-later; distribute the corresponding library/application
+source and rebuild/relink instructions alongside binaries, with the notices.
+Raw build directories are not release assets: debug files, caches and generated
+commands can expose personal installation paths. The ESP-IDF components carry
 their own licenses. SDK version/commit is recorded in `compatibility-evidence.txt`.
 If using a modified SDK, also make those modifications available with the release.
 The packager includes tracked SDK changes in `source.zip` as
@@ -131,6 +132,6 @@ and run `bash build.sh`. The release defaults already select public/NVS settings
 Apply `esp-idf-local.patch` in the SDK checkout first if it is nonempty.
 You may modify the LGPL library, rebuild, and flash the resulting binaries using
 the same offsets. No signing key or installation lock is required.
-For low-level inspection/relinking, extract `relink-build.zip` into the example's
-`build/` directory. Generated commands contain original staging paths: regenerate
-with `idf.py reconfigure` before relinking at a new path.
+Rebuilding the supplied source generates fresh ELF, object files, static
+libraries and linker commands in your own build directory for inspection and
+relinking, without relying on paths from the maintainer's machine.
