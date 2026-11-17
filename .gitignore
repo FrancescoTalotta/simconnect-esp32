@@ -1,0 +1,32 @@
+.DS_Store
+build/
+managed_components/
+sdkconfig
+sdkconfig.old
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.*
+!.env.example
+sdkconfig.defaults.local
+sdkconfig.secrets
+app_config.h
+.cache/
+*.dSYM/
+dist/
+# Private provisioning images and their plaintext inputs.
+*-settings.bin
+*-settings.csv
+# Compiled artifacts, archives, logs, and private key material must not enter Git.
+*.bin
+*.elf
+*.map
+*.o
+*.a
+*.zip
+*.log
+*.pem
+*.key
+*.p12
+*.pfx

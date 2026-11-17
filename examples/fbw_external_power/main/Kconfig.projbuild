@@ -1,0 +1,8 @@
+menu "SimConnect example"
+config APP_PUBLIC_FIRMWARE
+    bool "Build public firmware without local app_config.h"
+    default n
+    help
+        Ignore all local compile-time settings. Configuration must be supplied
+        in the simconnect NVS namespace. Use tools/package_release.py.
+endmenu

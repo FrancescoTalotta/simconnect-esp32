@@ -1,0 +1,13 @@
+// Copy to app_config.h (ignored by Git). Never publish that file or real credentials.
+#pragma once
+#define APP_WIFI_SSID "YOUR_2_4_GHZ_WIFI"
+#define APP_WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
+#define APP_SIM_HOST "192.168.1.100"
+#define APP_SIM_PORT "5111"
+// Case-sensitive substring of the TITLE SimVar; the firmware logs the actual title.
+// Confirm your installed A32NX release's title before changing this filter.
+#define APP_AIRCRAFT_MATCH "FlyByWire"
+// Reference board v1.1: 38. Only select 48 if your board is the original v1.0.
+#define APP_RGB_LED_GPIO 38
+// BRT/TEST blue channel, 0..255. DIM uses 10%; mirrors the Korry ON legend.
+#define APP_RGB_LED_BRIGHTNESS 16
